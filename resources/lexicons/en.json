@@ -1,0 +1,26 @@
+{
+  "happy": {
+    "sentiment": "positive",
+    "weight": 1
+  },
+  "sad": {
+    "sentiment": "negative",
+    "weight": -1
+  },
+  "good": {
+    "sentiment": "positive",
+    "weight": 1
+  },
+  "bad": {
+    "sentiment": "negative",
+    "weight": -1
+  },
+  "excellent": {
+    "sentiment": "positive",
+    "weight": 1.5
+  },
+  "terrible": {
+    "sentiment": "negative",
+    "weight": -1.5
+  }
+}
