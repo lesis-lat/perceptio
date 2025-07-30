@@ -50,15 +50,32 @@ sub list_languages {
 sub format_output {
     my ( $result, $format ) = @_;
     my $output_str;
+
     if ( $format eq 'json' ) {
         $output_str = encode_json($result);
     }
     else {
         $output_str = "Sentiment Score: $result->{score}\n";
         $output_str .= "Matched Words:\n";
+
         for my $entry ( @{ $result->{words} } ) {
+            my $emotions = $entry->{emotions};
+
+            # calculate word-specific score and sentiment for display
+            my $p_val = $emotions->{positive} || 0;
+            my $n_val = $emotions->{negative} || 0;
+            my $word_score = $p_val - $n_val;
+
+            my $sentiment_label = 'neutral';
+            if ( $word_score > 0 ) {
+                $sentiment_label = 'positive';
+            }
+            if ( $word_score < 0 ) {
+                $sentiment_label = 'negative';
+            }
+
             $output_str .=
-"  - Word: '$entry->{word}', Sentiment: $entry->{sentiment}, Weight: $entry->{weight}\n";
+              "  - Word: '$entry->{word}', Sentiment: $sentiment_label, Score: $word_score\n";
         }
     }
     return $output_str;
