@@ -16,10 +16,10 @@ Readonly my $EXPECTED_NEGATIVE_SCORE => -2.5;
 Readonly my $TERRIBLE_SCORE          => -1.5;
 
 my $mock_lexicon = {
-    good      => { sentiment => 'positive', weight => 1 },
-    excellent => { sentiment => 'positive', weight => 1.5 },
-    bad       => { sentiment => 'negative', weight => -1 },
-    terrible  => { sentiment => 'negative', weight => -1.5 },
+    good      => { positive => 1,   negative => 0 },
+    excellent => { positive => 1.5, negative => 0 },
+    bad       => { positive => 0,   negative => 1 },
+    terrible  => { positive => 0,   negative => 1.5 },
 };
 
 my $analyzer = Perceptio::Lexicon::Analyzer->new;
@@ -28,13 +28,14 @@ isa_ok($analyzer, 'Perceptio::Lexicon::Analyzer', 'new() creates a valid Analyze
 subtest 'Core Sentiment Scoring Logic' => sub {
     my $result_pos = $analyzer->analyze_sentiment('This is a good and excellent test', $mock_lexicon);
     is($result_pos->{score}, $EXPECTED_POSITIVE_SCORE, 'Correctly calculates a purely positive score');
+
     is_deeply(
         $result_pos->{words},
         [
-            { word => 'good',      sentiment => 'positive', weight => 1 },
-            { word => 'excellent', sentiment => 'positive', weight => 1.5 },
+            { word => 'good',      emotions => { positive => 1,   negative => 0 } },
+            { word => 'excellent', emotions => { positive => 1.5, negative => 0 } },
         ],
-        'Correctly identifies all positive words in order'
+        'Correctly identifies all positive words and their emotions in order'
     );
 
     my $result_neg = $analyzer->analyze_sentiment('This is a bad and terrible test', $mock_lexicon);
@@ -42,22 +43,33 @@ subtest 'Core Sentiment Scoring Logic' => sub {
 
     my $result_mixed = $analyzer->analyze_sentiment('This test is good, but also bad.', $mock_lexicon);
     is($result_mixed->{score}, 0, 'Correctly calculates a mixed score that results in zero');
+
+    is_deeply(
+        $result_mixed->{words},
+        [
+            { word => 'good', emotions => { positive => 1, negative => 0 } },
+            { word => 'bad',  emotions => { positive => 0, negative => 1 } },
+        ],
+        'Correctly identifies all words and emotions in a mixed-sentiment text'
+    );
 };
 
 subtest 'Input Normalization and Cleaning' => sub {
     my $result_case = $analyzer->analyze_sentiment('This test is GOOD!', $mock_lexicon);
     is($result_case->{score}, 1, 'Analysis is case-insensitive');
+
     is_deeply(
         $result_case->{words},
-        [ { word => 'good', sentiment => 'positive', weight => 1 } ],
+        [ { word => 'good', emotions => { positive => 1, negative => 0 } } ],
         'Identifies case-insensitive word and normalizes it'
     );
 
     my $result_punct = $analyzer->analyze_sentiment('This is terrible.', $mock_lexicon);
     is($result_punct->{score}, $TERRIBLE_SCORE, 'Correctly handles trailing punctuation');
+
     is_deeply(
         $result_punct->{words},
-        [ { word => 'terrible', sentiment => 'negative', weight => -1.5 } ],
+        [ { word => 'terrible', emotions => { positive => 0, negative => 1.5 } } ],
         'Identifies word correctly when followed by a period'
     );
 
