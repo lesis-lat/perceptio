@@ -17,8 +17,8 @@ COPY --from=builder /usr/local/bin/cpanm /usr/local/bin/
 COPY lib ./lib
 COPY resources ./resources
 COPY scripts ./scripts
-COPY calidoscopio.pl ./calidoscopio.pl
+COPY perceptio.pl ./perceptio.pl
 
-ENTRYPOINT ["perl", "./calidoscopio.pl"]
+ENTRYPOINT ["perl", "./perceptio.pl"]
 
 CMD ["--help"]
