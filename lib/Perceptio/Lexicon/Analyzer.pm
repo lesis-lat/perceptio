@@ -3,7 +3,7 @@ package Perceptio::Lexicon::Analyzer;
 use strict;
 use warnings;
 
-our $VERSION   = '0.0.1';
+our $VERSION = '0.0.1';
 
 sub new {
     my ($class) = @_;
@@ -22,11 +22,16 @@ sub analyze_sentiment {
         $word =~ s/^[.,!?;"]+//smx;
 
         if (exists $lexicon->{$word}) {
-            $score += $lexicon->{$word}{weight};
+            my $word_emotions = $lexicon->{$word};
+
+            # calculate score as positive minus negative.
+            my $positive_val = $word_emotions->{positive} || 0;
+            my $negative_val = $word_emotions->{negative} || 0;
+            $score += ( $positive_val - $negative_val );
+
             push @found_words, {
-                word      => $word,
-                sentiment => $lexicon->{$word}{sentiment},
-                weight    => $lexicon->{$word}{weight}
+                word     => $word,
+                emotions => $word_emotions,
             };
         }
     }
