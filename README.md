@@ -1,6 +1,6 @@
 <p align="center">
   <h3 align="center"><b>Perceptio</b></h3>
-  <p align="center">A multilingual, lexicon-based sentiment analysis tool for Perl.</p>
+  <p align="center">A multilingual, lexicon-based sentiment analysis tool for textual data.</p>
   <p align="center">
     <a href="https://github.com/lesis-lat/perceptio/blob/main/LICENSE.md">
       <img src="https://img.shields.io/badge/license-MIT-blue.svg">
