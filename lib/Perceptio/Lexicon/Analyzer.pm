@@ -16,7 +16,7 @@ our @EXPORT_OK = qw(
 
 sub tokenize_text {
     my ($text) = @_;
-    my $normalized = lc $text;
+    my $normalized = lc( $text // q// );
     $normalized =~ s/[[:punct:]\d]+//gmsx;
     return [ grep { length } split /\s+/smx, $normalized ];
 }
@@ -44,7 +44,7 @@ sub calculate_polarity_analysis {
         };
     }
 
-    my $total_score = sum( map { $_->{score} } @found_words );
+    my $total_score = sum( 0, map { $_->{score} } @found_words );
 
     return {
         score => $total_score,
