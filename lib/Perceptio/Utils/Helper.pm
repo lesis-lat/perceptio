@@ -7,6 +7,7 @@ use Const::Fast;
 use Exporter qw(import);
 
 our $VERSION   = '0.0.1';
+
 our @EXPORT_OK = qw(get_interface_info);
 
 const my $INTERFACE_INFO => <<'END_INFO';
@@ -21,6 +22,7 @@ A multilingual sentiment analysis tool.
     --input <text_or_path>    Input text string or path to a file containing text.
     --output <file>           Optional output file path (default: STDOUT).
     --format <plain|json>     Output format for sentiment result (default: plain).
+    --by-sentence             Analyze sentiment for each sentence individually.
     --generate-lexicons       Generate pt and es lexicons from en.json using an API.
     --overwrite               Overwrite existing lexicon files during generation.
     --list-languages          List currently available lexicon language files.
