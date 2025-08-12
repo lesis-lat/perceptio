@@ -10,44 +10,54 @@ use File::Spec;
 use FindBin;
 use Try::Tiny;
 
-our $VERSION   = '0.0.1';
-
-my $DEFAULT_LEXICONS_DIR = File::Spec->catfile($FindBin::Bin, 'resources', 'lexicons');
+our $VERSION = '0.0.1';
 
 sub new {
-    my ($class, %args) = @_;
+    my ($class) = @_;
 
     my $self = {
         cache => {},
-        lexicon_dir => $args{lexicon_dir} || $DEFAULT_LEXICONS_DIR,
     };
 
     return bless $self, $class;
 }
 
-sub load_lexicon {
-    my ($self, $lang) = @_;
+sub load_resource {
+    my ( $self, $type, $lang ) = @_;
 
-    return $self->{cache}{$lang} if exists $self->{cache}{$lang};
+    my $cache_key = "$type:$lang";
+    return $self->{cache}{$cache_key} if exists $self->{cache}{$cache_key};
 
-    my $file_path = File::Spec->catfile($self->{lexicon_dir}, "$lang.json");
+    my $dir_path = File::Spec->catfile( $FindBin::Bin, 'resources', $type );
+    my $file_path = File::Spec->catfile( $dir_path, "$lang.json" );
 
-    if (not -e $file_path) {
-        croak "Lexicon for language '$lang' not found at $file_path";
+    if ( not -e $file_path ) {
+        croak "Resource for type '$type' and language '$lang' not found at $file_path";
     }
 
-    my $json_text = read_text($file_path);
-    my $lexicon;
+    my $json_text;
+    my $data;
     try {
-        $lexicon = decode_json($json_text);
+        $json_text = read_text($file_path);
+        $data      = decode_json($json_text);
     }
     catch {
         croak "Error decoding JSON from $file_path: $_";
     };
 
-    $self->{cache}{$lang} = $lexicon;
+    $self->{cache}{$cache_key} = $data;
 
-    return $lexicon;
+    return $data;
+}
+
+sub load_lexicon {
+    my ( $self, $lang ) = @_;
+    return $self->load_resource( 'lexicons', $lang );
+}
+
+sub load_abbreviations {
+    my ( $self, $lang ) = @_;
+    return $self->load_resource( 'abbreviations', $lang );
 }
 
 1;
