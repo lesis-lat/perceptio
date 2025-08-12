@@ -12,7 +12,11 @@ use lib "$FindBin::Bin/lib";
 use Readonly;
 
 use Perceptio::Lexicon::Loader;
-use Perceptio::Lexicon::Analyzer;
+use Perceptio::Lexicon::Analyzer qw(
+    tokenize_text
+    calculate_polarity_analysis
+    calculate_emotion_analysis
+);
 use Perceptio::Utils::Helper qw(get_interface_info);
 
 our $VERSION = '0.0.1';
@@ -48,34 +52,24 @@ sub list_languages {
 }
 
 sub format_output {
-    my ( $result, $format ) = @_;
+    my ( $polarity_result, $emotion_result, $format ) = @_;
     my $output_str;
 
     if ( $format eq 'json' ) {
-        $output_str = encode_json($result);
+        my $combined_result = {
+            score => $polarity_result->{score},
+            words => $emotion_result->{words},
+        };
+        $output_str = JSON::MaybeXS->new( pretty => 1, canonical => 1 )->encode($combined_result);
     }
     else {
-        $output_str = "Sentiment Score: $result->{score}\n";
-        $output_str .= "Matched Words:\n";
-
-        for my $entry ( @{ $result->{words} } ) {
-            my $emotions = $entry->{emotions};
-
-            # calculate word-specific score and sentiment for display
-            my $p_val = $emotions->{positive} || 0;
-            my $n_val = $emotions->{negative} || 0;
-            my $word_score = $p_val - $n_val;
-
-            my $sentiment_label = 'neutral';
-            if ( $word_score > 0 ) {
-                $sentiment_label = 'positive';
+        $output_str = "Sentiment Score: $polarity_result->{score}\n";
+        if ( @{ $polarity_result->{words} } ) {
+            $output_str .= "Matched Words:\n";
+            for my $entry ( @{ $polarity_result->{words} } ) {
+                $output_str .=
+                  "  - Word: '$entry->{word}', Sentiment: $entry->{sentiment}, Score: $entry->{score}\n";
             }
-            if ( $word_score < 0 ) {
-                $sentiment_label = 'negative';
-            }
-
-            $output_str .=
-              "  - Word: '$entry->{word}', Sentiment: $sentiment_label, Score: $word_score\n";
         }
     }
     return $output_str;
@@ -83,20 +77,22 @@ sub format_output {
 
 sub analysis {
     my ($opts) = @_;
-    my $lang   = $opts->{lang} || 'en';
-    my $input =
-      $opts->{input}
+    my $lang   = $opts->{lang}   || 'en';
+    my $format = $opts->{format} || 'plain';
+    my $input  = $opts->{input}
       or croak "Error: --input <text_or_path> is required for analysis.\n"
       . get_interface_info();
-    my $format = $opts->{format} || 'plain';
 
-    my $loader   = Perceptio::Lexicon::Loader->new;
-    my $lexicon  = $loader->load_lexicon($lang);
-    my $analyzer = Perceptio::Lexicon::Analyzer->new;
-    my $text     = -f $input ? read_text($input) : $input;
-    my $result   = $analyzer->analyze_sentiment( $text, $lexicon );
+    my $loader  = Perceptio::Lexicon::Loader->new;
+    my $lexicon = $loader->load_lexicon($lang);
+    my $text    = -f $input ? read_text($input) : $input;
 
-    my $output_str = format_output( $result, $format );
+    my $tokens = tokenize_text($text);
+
+    my $polarity_result = calculate_polarity_analysis( $tokens, $lexicon );
+    my $emotion_result  = calculate_emotion_analysis( $tokens, $lexicon );
+
+    my $output_str = format_output( $polarity_result, $emotion_result, $format );
 
     if ( $opts->{output} ) {
         open my $fh, '>', $opts->{output}
