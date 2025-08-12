@@ -12,6 +12,7 @@ our @EXPORT_OK = qw(
     tokenize_text
     calculate_polarity_analysis
     calculate_emotion_analysis
+    calculate_sentence_analyses
 );
 
 sub tokenize_text {
@@ -55,7 +56,6 @@ sub calculate_polarity_analysis {
 sub calculate_emotion_analysis {
     my ( $tokens, $lexicon ) = @_;
     my @found_words;
-    my %aggregate_emotions;
 
     for my $word ( @{$tokens} ) {
         if ( !exists $lexicon->{$word} ) {
@@ -71,16 +71,28 @@ sub calculate_emotion_analysis {
             word     => $word,
             emotions => $word_emotions,
         };
-
-        for my $emotion ( keys %{$word_emotions} ) {
-            $aggregate_emotions{$emotion} += $word_emotions->{$emotion};
-        }
     }
 
-    return {
-        emotions => \%aggregate_emotions,
-        words    => \@found_words,
-    };
+    return { words => \@found_words };
+}
+
+sub calculate_sentence_analyses {
+    my ( $sentences, $lexicon ) = @_;
+    my @results;
+
+    for my $sentence ( @{$sentences} ) {
+        my $tokens          = tokenize_text($sentence);
+        my $polarity_result = calculate_polarity_analysis( $tokens, $lexicon );
+        my $emotion_result  = calculate_emotion_analysis( $tokens, $lexicon );
+
+        push @results, {
+            sentence       => $sentence,
+            score          => $polarity_result->{score},
+            polarity_words => $polarity_result->{words},
+            emotion_words  => $emotion_result->{words},
+        };
+    }
+    return \@results;
 }
 
 1;
