@@ -16,7 +16,9 @@ use Perceptio::Lexicon::Analyzer qw(
     tokenize_text
     calculate_polarity_analysis
     calculate_emotion_analysis
+    calculate_sentence_analyses
 );
+use Perceptio::Engine::Splitter qw(split_text_into_sentences);
 use Perceptio::Utils::Helper qw(get_interface_info);
 
 our $VERSION = '0.0.1';
@@ -51,7 +53,7 @@ sub list_languages {
     return;
 }
 
-sub format_output {
+sub format_document_output {
     my ( $polarity_result, $emotion_result, $format ) = @_;
     my $output_str;
 
@@ -75,6 +77,42 @@ sub format_output {
     return $output_str;
 }
 
+sub format_sentence_output {
+    my ( $results, $format ) = @_;
+    my $output_str;
+
+    if ( $format eq 'json' ) {
+        my @json_results = map {
+            {
+                sentence => $_->{sentence},
+                score    => $_->{score},
+                words    => $_->{emotion_words},
+            }
+        } @{$results};
+        $output_str = JSON::MaybeXS->new( pretty => 1, canonical => 1 )->encode( \@json_results );
+    }
+    else {
+        my @lines;
+        for my $i ( 0 .. $#{$results} ) {
+            my $res          = $results->[$i];
+            my $sentence_num = $i + 1;
+            my $line         = "Sentence $sentence_num: \"$res->{sentence}\"\n";
+            $line .= "  Sentiment Score: $res->{score}\n";
+
+            if ( @{ $res->{polarity_words} } ) {
+                $line .= "  Matched Words:\n";
+                for my $entry ( @{ $res->{polarity_words} } ) {
+                    $line .=
+                      "    - Word: '$entry->{word}', Sentiment: $entry->{sentiment}, Score: $entry->{score}\n";
+                }
+            }
+            push @lines, $line;
+        }
+        $output_str = join "---\n", @lines;
+    }
+    return $output_str;
+}
+
 sub analysis {
     my ($opts) = @_;
     my $lang   = $opts->{lang}   || 'en';
@@ -83,16 +121,23 @@ sub analysis {
       or croak "Error: --input <text_or_path> is required for analysis.\n"
       . get_interface_info();
 
-    my $loader  = Perceptio::Lexicon::Loader->new;
-    my $lexicon = $loader->load_lexicon($lang);
-    my $text    = -f $input ? read_text($input) : $input;
+    my $loader     = Perceptio::Lexicon::Loader->new;
+    my $lexicon    = $loader->load_lexicon($lang);
+    my $text       = -f $input ? read_text($input) : $input;
+    my $output_str;
 
-    my $tokens = tokenize_text($text);
-
-    my $polarity_result = calculate_polarity_analysis( $tokens, $lexicon );
-    my $emotion_result  = calculate_emotion_analysis( $tokens, $lexicon );
-
-    my $output_str = format_output( $polarity_result, $emotion_result, $format );
+    if ( $opts->{by_sentence} ) {
+        my $abbreviations = $loader->load_abbreviations($lang);
+        my $sentences     = split_text_into_sentences( $text, $abbreviations );
+        my $results       = calculate_sentence_analyses( $sentences, $lexicon );
+        $output_str = format_sentence_output( $results, $format );
+    }
+    else {
+        my $tokens          = tokenize_text($text);
+        my $polarity_result = calculate_polarity_analysis( $tokens, $lexicon );
+        my $emotion_result  = calculate_emotion_analysis( $tokens, $lexicon );
+        $output_str = format_document_output( $polarity_result, $emotion_result, $format );
+    }
 
     if ( $opts->{output} ) {
         open my $fh, '>', $opts->{output}
@@ -116,6 +161,7 @@ sub main {
         'input=s'           => \$opts{input},
         'output=s'          => \$opts{output},
         'format=s'          => \$opts{format},
+        'by-sentence'       => \$opts{by_sentence},
         'generate-lexicons' => \$opts{generate_lexicons},
         'overwrite'         => \$opts{overwrite},
         'list-languages'    => \$opts{list_languages},
