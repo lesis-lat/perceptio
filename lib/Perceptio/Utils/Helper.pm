@@ -18,6 +18,7 @@ A multilingual sentiment analysis tool.
     Command                   Description
     -------                   -----------
     --analyze                 Analyze sentiment of the given input (string or file).
+    --auto                    Automatically identify the language of the given input.
     --lang <en|pt|es>         Language code of the input (default: en).
     --input <text_or_path>    Input text string or path to a file containing text.
     --output <file>           Optional output file path (default: STDOUT).
