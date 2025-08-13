@@ -10,6 +10,7 @@ use JSON::MaybeXS;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use Readonly;
+use Lingua::Identify qw(langof);
 
 use Perceptio::Lexicon::Loader;
 use Perceptio::Lexicon::Analyzer qw(
@@ -113,17 +114,32 @@ sub format_sentence_output {
     return $output_str;
 }
 
+sub determine_language {
+    my ( $opts, $text ) = @_;
+
+    if ( $opts->{auto} ) {
+        my %lang_info = langof($text);
+        if (%lang_info) {
+            my ($detected_lang) =
+              sort { $lang_info{$b} <=> $lang_info{$a} } keys %lang_info;
+            return $detected_lang;
+        }
+    }
+
+    return $opts->{lang} || 'en';
+}
+
 sub analysis {
     my ($opts) = @_;
-    my $lang   = $opts->{lang}   || 'en';
     my $format = $opts->{format} || 'plain';
-    my $input  = $opts->{input}
+    my $input = $opts->{input}
       or croak "Error: --input <text_or_path> is required for analysis.\n"
       . get_interface_info();
 
+    my $text       = -f $input ? read_text($input) : $input;
+    my $lang       = determine_language( $opts, $text );
     my $loader     = Perceptio::Lexicon::Loader->new;
     my $lexicon    = $loader->load_lexicon($lang);
-    my $text       = -f $input ? read_text($input) : $input;
     my $output_str;
 
     if ( $opts->{by_sentence} ) {
@@ -157,6 +173,7 @@ sub main {
     my %opts;
     GetOptions(
         'analyze'           => \$opts{analyze},
+        'auto'              => \$opts{auto},
         'lang=s'            => \$opts{lang},
         'input=s'           => \$opts{input},
         'output=s'          => \$opts{output},
