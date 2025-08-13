@@ -5,7 +5,7 @@ requires 'List::Util',          '1.69';
 requires 'Encode',              '3.21';
 requires 'Const::Fast',         '0.014';
 requires 'HTTP::Tiny',          '0.090';
-requires 'Lingua::Identify'      '0.56';
+requires 'Lingua::Identify'     '0.56';
 
 on 'test' => sub {
 requires 'Test::More',          '1.302214';
