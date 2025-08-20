@@ -26,14 +26,19 @@ our $VERSION = '0.0.1';
 
 Readonly my $JSON_EXT_LENGTH => -5;
 
-sub generate_lexicons {
+sub generate_resources {
     my ($opts) = @_;
-    my @args = ( 'perl', 'scripts/generate-lexicons.pl' );
+    my @args = ( 'perl', 'scripts/generate-resources.pl' );
+    my $type = $opts->{generate_resources} || 'all';
+
+    push @args, '--type', $type;
+
     if ( $opts->{overwrite} ) {
         push @args, '--overwrite';
     }
+
     system(@args) == 0
-      or croak "Lexicon generation script failed with status: $CHILD_ERROR";
+      or croak "Resource generation script failed with status: $CHILD_ERROR";
     return;
 }
 
@@ -121,7 +126,7 @@ sub determine_language {
         my %lang_info = langof($text);
         if (%lang_info) {
             my ($detected_lang) =
-              sort { $lang_info{$b} <=> $lang_info{$a} } keys %lang_info;
+              reverse sort { $lang_info{$a} <=> $lang_info{$b} } keys %lang_info;
             return $detected_lang;
         }
     }
@@ -172,17 +177,17 @@ sub analysis {
 sub main {
     my %opts;
     GetOptions(
-        'analyze'           => \$opts{analyze},
-        'auto'              => \$opts{auto},
-        'lang=s'            => \$opts{lang},
-        'input=s'           => \$opts{input},
-        'output=s'          => \$opts{output},
-        'format=s'          => \$opts{format},
-        'by-sentence'       => \$opts{by_sentence},
-        'generate-lexicons' => \$opts{generate_lexicons},
-        'overwrite'         => \$opts{overwrite},
-        'list-languages'    => \$opts{list_languages},
-        'help|h'            => \$opts{help},
+        'analyze'            => \$opts{analyze},
+        'auto'               => \$opts{auto},
+        'lang=s'             => \$opts{lang},
+        'input=s'            => \$opts{input},
+        'output=s'           => \$opts{output},
+        'format=s'           => \$opts{format},
+        'by-sentence'        => \$opts{by_sentence},
+        'generate-resources:s' => \$opts{generate_resources},
+        'overwrite'          => \$opts{overwrite},
+        'list-languages'     => \$opts{list_languages},
+        'help|h'             => \$opts{help},
     ) or croak get_interface_info();
 
     if ( $opts{help} ) {
@@ -191,8 +196,8 @@ sub main {
         exit 0;
     }
 
-    if ( $opts{generate_lexicons} ) {
-        generate_lexicons( \%opts );
+    if ( defined $opts{generate_resources} ) {
+        generate_resources( \%opts );
     }
     elsif ( $opts{list_languages} ) {
         list_languages();
