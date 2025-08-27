@@ -18,9 +18,9 @@
 Perceptio (from the Latin *perceptio*, meaning "to gather, receive") is a command-line tool for measuring the emotional sentiment of a text. It operates using a lexicon-based approach, where words are scored based on their associated emotions.
 
 Built to be extensible and easy to use, Perceptio provides the following features:
-* Text analysis in multiple languages (defaults include English, Portuguese, and Spanish).
-* Sentiment score calculation by identifying words in a text and summing their emotional values (e.g., positive vs. negative).
-* English lexicon translation into other languages using a free translation API, making it easy to add support for new languages.
+* Text analysis in multiple languages (defaults include English) with automatic language detection.
+* Granular sentiment analysis on a whole document or on a sentence-by-sentence basis.
+* Translation of English lexicons and abbreviation lists into other languages using the Google Cloud Translation API, making it easy to add support for new languages.
 * Input acceptance directly as a string or from a file, and outputs results to the console or a file in either plain text or JSON format.
 
 Perceptio aims to provide a simple yet effective way to perform sentiment analysis from the command line.
@@ -29,8 +29,9 @@ Perceptio aims to provide a simple yet effective way to perform sentiment analys
 
 ### Prerequisites
 
--   Perl 5.42+
--   `cpanm` (to install dependencies)
+-  Perl v5.42+
+-  `cpanm` (to install dependencies)
+-  A Google Cloud API Key for the resource translation feature.
 
 ---
 
@@ -42,6 +43,9 @@ git clone https://github.com/your-username/perceptio.git && cd perceptio
 
 # Install dependencies
 cpanm --installdeps .
+
+# Set API Key
+export GOOGLE_API_KEY="your_api_key_here"
 ```
 
 ---
@@ -57,17 +61,20 @@ $ perl perceptio.pl --help
 Perceptio v0.0.1
 A multilingual sentiment analysis tool.
 ========================================
-    Command                   Description
-    -------                   -----------
-    --analyze                 Analyze sentiment of the given input (string or file).
-    --lang <en|pt|es>         Language code of the input (default: en).
-    --input <text_or_path>    Input text string or path to a file containing text.
-    --output <file>           Optional output file path (default: STDOUT).
-    --format <plain|json>     Output format for sentiment result (default: plain).
-    --generate-lexicons       Generate pt and es lexicons from en.json using an API.
-    --overwrite               Overwrite existing lexicon files during generation.
-    --list-languages          List currently available lexicon language files.
-    -h, --help                Display this help menu.
+    Command                       Description
+    -------                       -----------
+    --analyze                     Analyze sentiment of the given input (string or file).
+    --auto                        Automatically identify the language of the given input.
+    --lang <en|pt|es>             Language code of the input (default: en).
+    --input <text_or_path>        Input text string or path to a file containing text.
+    --output <file>               Optional output file path (default: STDOUT).
+    --format <plain|json>         Output format for sentiment result (default: plain).
+    --by-sentence                 Analyze sentiment for each sentence individually.
+    --generate-resources [type]   Generate translated resource files. Type can be 'lexicons',
+                                  'abbreviations', or 'all' (default).
+    --overwrite                   Overwrite existing resource files during generation.
+    --list-languages              List currently available lexicon language files.
+    -h, --help                    Display this help menu.
 ```
 
 You can also build and run Perceptio using the included `Dockerfile`.
@@ -105,58 +112,94 @@ Matched Words:
   - Word: 'hate', Sentiment: negative, Score: -1
 ```
 
+Use the --by-sentence flag to analyze each sentence individually.
+
+```bash
+$ perl perceptio.pl --analyze --input "I love happy days. I hate sad moments." --by-sentence
+
+Sentence 1: "I love happy days."
+  Sentiment Score: 2
+  Matched Words:
+    - Word: 'love', Sentiment: positive, Score: 1
+    - Word: 'happy', Sentiment: positive, Score: 1
+---
+Sentence 2: "I hate sad moments."
+  Sentiment Score: -1
+  Matched Words:
+    - Word: 'hate', Sentiment: negative, Score: -1
+```
+
 To get structured output suitable for scripting, use the `--format json` option.
 
 ```bash
-$ perl perceptio.pl --analyze --input "This is a great tool" --format json
+$ perceptio % perl perceptio.pl --analyze --input "I love happy days, but I hate sad moments." --format json
 
 {
-  "words": [
-    {
-      "emotions": {
-        "disgust": "0",
-        "surprise": "0",
-        "anticipation": "1",
-        "fear": "0",
-        "trust": "1",
-        "negative": "0",
-        "anger": "0",
-        "joy": "1",
-        "sadness": "0",
-        "positive": "1"
+   "score" : 1,
+   "words" : [
+      {
+         "emotions" : {
+            "anger" : "0",
+            "anticipation" : "0",
+            "disgust" : "0",
+            "fear" : "0",
+            "joy" : "1",
+            "negative" : "0",
+            "positive" : "1",
+            "sadness" : "0",
+            "surprise" : "0",
+            "trust" : "0"
+         },
+         "word" : "love"
       },
-      "word": "happy"
-    },
-    {
-      "emotions": {
-        "anticipation": "1",
-        "fear": "0",
-        "surprise": "0",
-        "disgust": "0",
-        "positive": "0",
-        "sadness": "0",
-        "joy": "0",
-        "anger": "0",
-        "negative": "0",
-        "trust": "0"
+      {
+         "emotions" : {
+            "anger" : "0",
+            "anticipation" : "1",
+            "disgust" : "0",
+            "fear" : "0",
+            "joy" : "1",
+            "negative" : "0",
+            "positive" : "1",
+            "sadness" : "0",
+            "surprise" : "0",
+            "trust" : "1"
+         },
+         "word" : "happy"
       },
-      "word": "result"
-    }
-  ],
-  "score": 1
+      {
+         "emotions" : {
+            "anger" : "1",
+            "anticipation" : "0",
+            "disgust" : "1",
+            "fear" : "1",
+            "joy" : "0",
+            "negative" : "1",
+            "positive" : "0",
+            "sadness" : "1",
+            "surprise" : "0",
+            "trust" : "0"
+         },
+         "word" : "hate"
+      }
+   ]
 }
 ```
 
-Run the lexicon generation script to translate the base `en.json` file.
+Run the resource generation script to translate the base en.json files for lexicons and abbreviations. Remember to set your GOOGLE_API_KEY.
 
 ```bash
-$ perl perceptio.pl --generate-lexicons
+$ perl perceptio.pl --generate-resources
 
-Translating to pt...
-Wrote pt lexicon to resources/lexicons/pt.json
-Translating to es...
-Wrote es lexicon to resources/lexicons/es.json
-Lexicon generation complete.
+Translating lexicons to pt...
+Wrote pt lexicons to resources/lexicons/pt.json
+Translating lexicons to es...
+Wrote es lexicons to resources/lexicons/es.json
+Translating abbreviations to pt...
+Wrote pt abbreviations to resources/abbreviations/pt.json
+Translating abbreviations to es...
+Wrote es abbreviations to resources/abbreviations/es.json
+Resource generation complete.
 ```
 
 ---
