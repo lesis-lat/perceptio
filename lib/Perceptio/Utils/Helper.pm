@@ -12,8 +12,8 @@ our @EXPORT_OK = qw(get_interface_info);
 const my $INTERFACE_INFO => <<'END_INFO';
 
 Perceptio v0.0.1
-A multilingual sentiment analysis tool.
-========================================
+A multilingual sentiment analysis framework.
+============================================
     Command                       Description
     -------                       -----------
     --analyze                     Analyze sentiment of the given input (string or file).
