@@ -17,24 +17,51 @@ use Perceptio::Lexicon::Loader;
 
 our $VERSION = '0.0.1';
 
-my $temp_dir = File::Spec->catdir( $FindBin::Bin, 'temp_test_lexicons' );
-make_path($temp_dir);
+my $base_dir     = $FindBin::Bin;
+my $resource_dir = File::Spec->catdir( $base_dir, 'resources' );
+my $lexicon_dir  = File::Spec->catdir( $resource_dir, 'lexicons' );
+make_path($lexicon_dir);
 
-my $dummy_lexicon_path = File::Spec->catfile( $temp_dir, 'xx.json' );
-my $dummy_lexicon_data = { test => { sentiment => 'neutral', weight => 0 } };
+my $dummy_lexicon_path = File::Spec->catfile( $lexicon_dir, 'en.json' );
+my $dummy_lexicon_data = { hello => { sentiment => 'positive', weight => 0.5 } };
 
 open my $fh, '>', $dummy_lexicon_path
-  or croak 'Could not create dummy lexicon file: ', $OS_ERROR;
+  or croak "Could not create dummy lexicon file: $OS_ERROR";
 print {$fh} encode_json($dummy_lexicon_data)
-  or croak 'Could not write to dummy lexicon file: ', $OS_ERROR;
-close $fh or croak 'Could not close dummy lexicon file: ', $OS_ERROR;
+  or croak "Could not write to dummy lexicon file: $OS_ERROR";
+close $fh or croak "Could not close dummy lexicon file: $OS_ERROR";
 
-my $loader = Perceptio::Lexicon::Loader->new( lexicon_dir => $temp_dir );
-isa_ok( $loader, 'Perceptio::Lexicon::Loader',
-    'new() with injected path creates a valid object' );
+my $loader = Perceptio::Lexicon::Loader->new();
+isa_ok( $loader, 'Perceptio::Lexicon::Loader', 'new() creates a valid object' );
 
-subtest 'Lexicon Loading with Injected Path' => sub {
-    my $lexicon = $loader->load_lexicon('xx');
+subtest 'Lexicon Loading' => sub {
+    plan tests => 2;
+
+    my $lexicon = $loader->load_lexicon('en');
+    is_deeply( $lexicon, $dummy_lexicon_data,
+        q{load_lexicon('en') correctly loads from the created resources directory} );
+
+    my $lexicon_from_cache = $loader->load_lexicon('en');
+    is( $lexicon, $lexicon_from_cache,
+        'load_lexicon() returns a cached reference on the second call' );
+};
+
+subtest 'Error Handling' => sub {
+    plan tests => 1;
+
+    my $err_intro  = qr{Resource[ ]for[ ]type[ ]'lexicons'}smx;
+    my $err_lang   = qr{and[ ]language[ ]'yy'}smx;
+    my $err_status = qr{not[ ]found[ ]at[ ].*}smx;
+    my $err_file   = qr{yy[.]json}smx;
+
+    throws_ok { $loader->load_lexicon('yy') }
+      qr/$err_intro[ ]$err_lang[ ]$err_status$err_file/smx,
+      'load_lexicon() dies correctly for a non-existent language';
+};
+
+remove_tree($resource_dir);
+
+done_testing();    my $lexicon = $loader->load_lexicon('xx');
     is_deeply( $lexicon, $dummy_lexicon_data,
         'load_lexicon() correctly loads from the injected directory' );
 
