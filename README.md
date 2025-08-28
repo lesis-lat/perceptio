@@ -1,13 +1,17 @@
 <p align="center">
   <h3 align="center"><b>Perceptio</b></h3>
-  <p align="center">A multilingual, lexicon-based sentiment analysis tool for textual data.</p>
+  <p align="center">A multilingual, lexicon-based sentiment analysis framework for textual data.</p>
   <p align="center">
-    <a href="https://github.com/lesis-lat/perceptio/blob/main/LICENSE.md">
+    <a href="/LICENSE.md">
       <img src="https://img.shields.io/badge/license-MIT-blue.svg">
     </a>
-     <a href="https://github.com/lesis-lat/perceptio/releases">
-      <img src="https://img.shields.io/badge/version-0.0.1-blue.svg">
+     <a href="https://github.com/instriq/security-gate/releases">
+      <img src="https://img.shields.io/badge/version-0.1.0-blue.svg">
     </a>
+    <img src="https://github.com/instriq/perceptio/actions/workflows/linter.yml/badge.svg">
+    <img src="https://github.com/instriq/perceptio/actions/workflows/zarn.yml/badge.svg">
+    <img src="https://github.com/instriq/perceptio/actions/workflows/security-gate.yml/badge.svg">
+    <img src="https://img.shields.io/badge/coverage-93.3%25-brightgreen.svg">
   </p>
 </p>
 
@@ -15,7 +19,7 @@
 
 ### Summary
 
-Perceptio (from the Latin *perceptio*, meaning "to gather, receive") is a command-line tool for measuring the emotional sentiment of a text. It operates using a lexicon-based approach, where words are scored based on their associated emotions.
+Perceptio (from the Latin *perceptio*, meaning "to gather, receive") is a command-line framework for measuring the emotional sentiment of a text. It operates using a lexicon-based approach, where words are scored based on their associated emotions.
 
 Built to be extensible and easy to use, Perceptio provides the following features:
 * Text analysis in multiple languages (defaults include English) with automatic language detection.
