@@ -63,8 +63,8 @@ $ perl perceptio.pl --help
 ```
 ```
 Perceptio v0.0.1
-A multilingual sentiment analysis tool.
-========================================
+A multilingual sentiment analysis framework.
+============================================
     Command                       Description
     -------                       -----------
     --analyze                     Analyze sentiment of the given input (string or file).
