@@ -13,5 +13,6 @@ requires 'Test::Exception',     '0.43';
 requires 'Test::MockObject',    '1.20200122';
 requires 'Test::MockModule',    '0.180.0';
 requires 'Readonly',            '2.05';
+requires 'Try::Tiny',           '0.32';
 
 };
