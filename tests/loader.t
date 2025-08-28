@@ -61,22 +61,4 @@ subtest 'Error Handling' => sub {
 
 remove_tree($resource_dir);
 
-done_testing();    my $lexicon = $loader->load_lexicon('xx');
-    is_deeply( $lexicon, $dummy_lexicon_data,
-        'load_lexicon() correctly loads from the injected directory' );
-
-    my $lexicon_from_cache = $loader->load_lexicon('xx');
-    is( $lexicon, $lexicon_from_cache,
-        'load_lexicon() returns a cached reference on the second call' );
-};
-
-subtest 'Error Handling' => sub {
-    my $err_prefix = qr{ Lexicon[ ]for[ ]language[ ]'yy'[ ]not[ ]found[ ]at[ ].*? }smx;
-    my $err_suffix = qr{ temp_test_lexicons [\\/] yy [.] json }smx;
-    throws_ok { $loader->load_lexicon('yy') } qr/$err_prefix$err_suffix/smx,
-      'load_lexicon() dies correctly for a non-existent language';
-};
-
-remove_tree($temp_dir);
-
 done_testing();
