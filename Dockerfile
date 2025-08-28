@@ -2,6 +2,12 @@ FROM perl:5.42-slim AS builder
 
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN cpanm App::cpanminus
 
 COPY cpanfile /app/
@@ -20,5 +26,4 @@ COPY scripts ./scripts
 COPY perceptio.pl ./perceptio.pl
 
 ENTRYPOINT ["perl", "./perceptio.pl"]
-
 CMD ["--help"]
