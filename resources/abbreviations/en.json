@@ -1,0 +1,28 @@
+{
+    "abbreviations": [
+        "Adm", "Ala", "Ariz", "Ark", "Assn", "Atty", "Aug", "Ave",
+        "Bros", "Blvd",
+        "Capt", "Cal", "Calif", "Cmdr", "Col", "Colo", "Conn", "Corp",
+        "Cpl",
+        "Dec", "Del", "Dept", "Dr",
+        "Esq", "etc",
+        "Feb", "Fla",
+        "Ga", "Gen", "Gov",
+        "Ill", "Inc", "Ind",
+        "Jan", "Jr",
+        "Kan", "Ky",
+        "La", "Lt", "Ltd",
+        "Maj", "Mar", "Md", "Mass", "Messrs", "Mich", "Minn", "Miss", "Mr", "Mrs",
+        "Mo", "Mont", "Ms",
+        "Neb", "Nev", "Nov",
+        "Oct",
+        "Okla", "Ore",
+        "Pa", "Pfc", "PhD", "Pvt",
+        "Rep", "Rev",
+        "Sask", "Sen", "Sep", "Sept", "Sgt", "Sr", "St", "Supt",
+        "Tenn", "Tex",
+        "Univ", "USA", "USAF",
+        "Va", "vs", "Vt",
+        "Wash", "Wis", "Wyo"
+    ]
+}
