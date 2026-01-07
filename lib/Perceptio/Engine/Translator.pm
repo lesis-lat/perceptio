@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Carp 'croak';
-use English qw(-no_match_vars);
 use HTTP::Tiny;
 use JSON::MaybeXS;
 use Readonly;
