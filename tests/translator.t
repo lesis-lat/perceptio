@@ -8,7 +8,7 @@ use JSON::MaybeXS;
 use Test::Exception;
 
 use FindBin;
-use lib '../lib/';
+use lib "$FindBin::Bin/../lib";
 
 use Perceptio::Engine::Translator;
 

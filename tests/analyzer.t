@@ -5,7 +5,8 @@ use warnings;
 use Test::More;
 use Readonly;
 
-use lib '../lib/';
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 
 use Perceptio::Lexicon::Analyzer qw(
     tokenize_text
