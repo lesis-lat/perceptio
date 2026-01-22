@@ -27,25 +27,35 @@ sub calculate_polarity_analysis {
     my @found_words;
 
     for my $word ( @{$tokens} ) {
-        if ( !exists $lexicon->{$word} ) {
+        if ( !exists $lexicon -> {$word} ) {
             next;
         }
 
-        my $emotions     = $lexicon->{$word};
-        my $positive_val = $emotions->{positive} // 0;
-        my $negative_val = $emotions->{negative} // 0;
+        my $emotions     = $lexicon -> {$word};
+        my $positive_val = $emotions -> {positive} // 0;
+        my $negative_val = $emotions -> {negative} // 0;
         my $word_score   = $positive_val - $negative_val;
 
-        next if $word_score == 0;
+        if ( $word_score == 0 ) {
+            next;
+        }
+
+        my $sentiment;
+        if ( $word_score > 0 ) {
+            $sentiment = 'positive';
+        }
+        if ( $word_score < 0 ) {
+            $sentiment = 'negative';
+        }
 
         push @found_words, {
             word      => $word,
-            sentiment => $word_score > 0 ? 'positive' : 'negative',
+            sentiment => $sentiment,
             score     => $word_score,
         };
     }
 
-    my $total_score = sum( 0, map { $_->{score} } @found_words );
+    my $total_score = sum( 0, map { $_ -> {score} } @found_words );
 
     return {
         score => $total_score,
@@ -58,11 +68,11 @@ sub calculate_emotion_analysis {
     my @found_words;
 
     for my $word ( @{$tokens} ) {
-        if ( !exists $lexicon->{$word} ) {
+        if ( !exists $lexicon -> {$word} ) {
             next;
         }
 
-        my $word_emotions = $lexicon->{$word};
+        my $word_emotions = $lexicon -> {$word};
         if ( !%{$word_emotions} ) {
             next;
         }
@@ -87,9 +97,9 @@ sub calculate_sentence_analyses {
 
         push @results, {
             sentence       => $sentence,
-            score          => $polarity_result->{score},
-            polarity_words => $polarity_result->{words},
-            emotion_words  => $emotion_result->{words},
+            score          => $polarity_result -> {score},
+            polarity_words => $polarity_result -> {words},
+            emotion_words  => $emotion_result -> {words},
         };
     }
     return \@results;

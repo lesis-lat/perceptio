@@ -38,14 +38,14 @@ sub new_task {
             }
 
             print "Translating $type to $lang...\n" or croak "print failed: $OS_ERROR";
-            my $translated_data = $translator->$translation_sub( $source_data, $lang );
+            my $translated_data = $translator -> $translation_sub( $source_data, $lang );
 
             if ($translated_data) {
-                my $json_text = JSON::MaybeXS->new( pretty => 1, canonical => 1 )->encode($translated_data);
+                my $json_text = JSON::MaybeXS -> new( pretty => 1, canonical => 1 ) -> encode($translated_data);
                 write_text( $output_path, $json_text );
                 print "Wrote $lang $type to $output_path\n" or croak "print failed: $OS_ERROR";
             }
-            else {
+            if ( !$translated_data ) {
                 warn "Translation of $type to $lang resulted in empty data. Skipping write.\n";
             }
         }
@@ -62,7 +62,7 @@ sub main {
     }
 
     my @target_languages = qw(pt es);
-    my $translator       = Perceptio::Engine::Translator->new;
+    my $translator       = Perceptio::Engine::Translator -> new;
     my @task_types;
     if ( $type eq 'lexicons' or $type eq 'all' ) {
         push @task_types, 'lexicons';
@@ -73,7 +73,7 @@ sub main {
 
     for my $task_type (@task_types) {
         my $task = new_task( $task_type, $translator, $overwrite, @target_languages );
-        $task->();
+        $task -> ();
     }
 
     print "Resource generation complete.\n" or croak "print failed: $OS_ERROR";
