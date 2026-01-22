@@ -15,8 +15,10 @@ Readonly my $SENTENCE_BREAK   => chr 2;
 
 sub protect_abbreviations {
     my ( $text, $abbreviations_data ) = @_;
-    my $abbreviations = $abbreviations_data->{abbreviations} // [];
-    return $text if !@{ $abbreviations };
+    my $abbreviations = $abbreviations_data -> {abbreviations} // [];
+    if ( !@{ $abbreviations } ) {
+        return $text;
+    }
 
     my $abbrev_pattern = join q{|}, @{$abbreviations};
     $text =~ s/\b($abbrev_pattern)[.](?=\s|[[:punct:]]|\z)/$1$PROTECTED_PERIOD/gmsx;
