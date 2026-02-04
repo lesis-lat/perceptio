@@ -13,21 +13,21 @@ our @EXPORT_OK = qw(run);
 
 sub run {
     my ($ops) = @_;
-    my @args = ( 'perl', 'scripts/generate-resources.pl' );
+    my @args = ('perl', 'scripts/generate-resources.pl');
     my $type = $ops -> {generate_resources};
 
-    if ( !$type ) {
+    if (!$type) {
         $type = 'all';
     }
 
     push @args, '--type', $type;
 
-    if ( $ops -> {overwrite} ) {
+    if ($ops -> {overwrite}) {
         push @args, '--overwrite';
     }
 
     my $result = system(@args);
-    if ( $result != 0 ) {
+    if ($result != 0) {
         croak "Resource generation script failed with status: $CHILD_ERROR";
     }
 

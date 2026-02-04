@@ -14,9 +14,9 @@ Readonly my $PROTECTED_PERIOD => chr 1;
 Readonly my $SENTENCE_BREAK   => chr 2;
 
 sub protect_abbreviations {
-    my ( $text, $abbreviations_data ) = @_;
+    my ($text, $abbreviations_data) = @_;
     my $abbreviations = $abbreviations_data -> {abbreviations} // [];
-    if ( !@{ $abbreviations } ) {
+    if (!@{$abbreviations}) {
         return $text;
     }
 
@@ -40,9 +40,9 @@ sub restore_periods {
 }
 
 sub split_text_into_sentences {
-    my ( $text, $abbreviations ) = @_;
+    my ($text, $abbreviations) = @_;
 
-    my $protected_text = protect_abbreviations( $text, $abbreviations );
+    my $protected_text = protect_abbreviations($text, $abbreviations);
     my $marked_text    = mark_sentence_breaks($protected_text);
     my @sentences      = split /$SENTENCE_BREAK/msx, $marked_text;
 
@@ -53,7 +53,7 @@ sub split_text_into_sentences {
         push @cleaned_sentences, $sentence;
     }
 
-    return [ grep { /\w/msx } @cleaned_sentences ];
+    return [grep { /\w/msx } @cleaned_sentences];
 }
 
 1;

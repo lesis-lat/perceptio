@@ -11,19 +11,19 @@ our $VERSION = '0.0.1';
 our @EXPORT_OK = qw(run);
 
 sub run {
-    my ( $ops, $text ) = @_;
+    my ($ops, $text) = @_;
 
-    if ( $ops -> {auto} ) {
+    if ($ops -> {auto}) {
         my %lang_info = langof($text);
         if (%lang_info) {
-            my ($detected_lang) =
-              reverse sort { $lang_info{$a} <=> $lang_info{$b} }
-              keys %lang_info;
+            my ($detected_lang) = reverse sort {
+                $lang_info{$a} <=> $lang_info{$b}
+            } keys %lang_info;
             return $detected_lang;
         }
     }
 
-    if ( $ops -> {lang} ) {
+    if ($ops -> {lang}) {
         return $ops -> {lang};
     }
 
