@@ -16,12 +16,12 @@ sub run {
     my ($ops) = @_;
     my $input = $ops -> {input};
 
-    if ( !$input ) {
+    if (!$input) {
         my $info = Perceptio::Component::InterfaceInfo::run();
         croak "Error: --input <text_or_path> is required for analysis.\n" . $info;
     }
 
-    if ( -f $input ) {
+    if (-f $input) {
         return read_text($input);
     }
 

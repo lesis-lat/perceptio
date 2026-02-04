@@ -12,15 +12,15 @@ our $VERSION = '0.0.1';
 our @EXPORT_OK = qw(run);
 
 sub run {
-    my ( $output_str, $output_path ) = @_;
+    my ($output_str, $output_path) = @_;
 
     if ($output_path) {
         open my $fh, '>', $output_path
-          or croak "Could not open file '$output_path' for writing: $OS_ERROR";
+            or croak "Could not open file '$output_path' for writing: $OS_ERROR";
         print {$fh} $output_str
-          or croak "Could not write to file '$output_path': $OS_ERROR";
+            or croak "Could not write to file '$output_path': $OS_ERROR";
         close $fh
-          or croak "Could not close file '$output_path': $OS_ERROR";
+            or croak "Could not close file '$output_path': $OS_ERROR";
         return;
     }
 

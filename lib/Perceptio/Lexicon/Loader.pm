@@ -15,25 +15,23 @@ our $VERSION = '0.0.1';
 sub new {
     my ($class) = @_;
 
-    my $self = {
-        cache => {},
-    };
+    my $self = {cache => {}};
 
     return bless $self, $class;
 }
 
 sub load_resource {
-    my ( $self, $type, $lang ) = @_;
+    my ($self, $type, $lang) = @_;
 
     my $cache_key = "$type:$lang";
-    if ( exists $self -> {cache}{$cache_key} ) {
+    if (exists $self -> {cache}{$cache_key}) {
         return $self -> {cache}{$cache_key};
     }
 
-    my $dir_path = File::Spec -> catfile( $FindBin::Bin, 'resources', $type );
-    my $file_path = File::Spec -> catfile( $dir_path, "$lang.json" );
+    my $dir_path = File::Spec -> catfile($FindBin::Bin, 'resources', $type);
+    my $file_path = File::Spec -> catfile($dir_path, "$lang.json");
 
-    if ( not -e $file_path ) {
+    if (not -e $file_path) {
         croak "Resource for type '$type' and language '$lang' not found at $file_path";
     }
 
@@ -53,13 +51,13 @@ sub load_resource {
 }
 
 sub load_lexicon {
-    my ( $self, $lang ) = @_;
-    return $self -> load_resource( 'lexicons', $lang );
+    my ($self, $lang) = @_;
+    return $self -> load_resource('lexicons', $lang);
 }
 
 sub load_abbreviations {
-    my ( $self, $lang ) = @_;
-    return $self -> load_resource( 'abbreviations', $lang );
+    my ($self, $lang) = @_;
+    return $self -> load_resource('abbreviations', $lang);
 }
 
 1;

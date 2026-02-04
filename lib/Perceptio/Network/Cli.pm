@@ -18,23 +18,23 @@ our @EXPORT_OK = qw(run);
 sub run {
     my $ops = Perceptio::Component::GetOps::run();
 
-    if ( $ops -> {help} ) {
+    if ($ops -> {help}) {
         my $info = Perceptio::Component::InterfaceInfo::run();
         Perceptio::Component::OutputWriter::run($info);
         return 0;
     }
 
-    if ( defined $ops -> {generate_resources} ) {
+    if (defined $ops -> {generate_resources}) {
         Perceptio::Component::GenerateResources::run($ops);
         return 0;
     }
 
-    if ( $ops -> {list_languages} ) {
+    if ($ops -> {list_languages}) {
         Perceptio::Component::ListLanguages::run();
         return 0;
     }
 
-    if ( $ops -> {analyze} ) {
+    if ($ops -> {analyze}) {
         Perceptio::Network::Analysis::run($ops);
         return 0;
     }

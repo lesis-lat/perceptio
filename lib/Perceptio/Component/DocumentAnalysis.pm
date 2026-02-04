@@ -15,14 +15,14 @@ our $VERSION = '0.0.1';
 our @EXPORT_OK = qw(run);
 
 sub run {
-    my ( $text, $lexicon ) = @_;
+    my ($text, $lexicon) = @_;
     my $tokens = tokenize_text($text);
-    my $polarity_result = calculate_polarity_analysis( $tokens, $lexicon );
-    my $emotion_result = calculate_emotion_analysis( $tokens, $lexicon );
+    my $polarity_result = calculate_polarity_analysis($tokens, $lexicon);
+    my $emotion_result = calculate_emotion_analysis($tokens, $lexicon);
 
     return {
         polarity => $polarity_result,
-        emotion => $emotion_result,
+        emotion  => $emotion_result,
     };
 }
 

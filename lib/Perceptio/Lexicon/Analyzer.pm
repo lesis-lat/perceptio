@@ -3,8 +3,8 @@ package Perceptio::Lexicon::Analyzer;
 use strict;
 use warnings;
 
-use List::Util qw(sum);
 use Exporter qw(import);
+use List::Util qw(sum);
 
 our $VERSION = '0.0.1';
 
@@ -17,34 +17,34 @@ our @EXPORT_OK = qw(
 
 sub tokenize_text {
     my ($text) = @_;
-    my $normalized = lc( $text // q// );
+    my $normalized = lc($text // q//);
     $normalized =~ s/[[:punct:]\d]+//gmsx;
-    return [ grep { length } split /\s+/smx, $normalized ];
+    return [grep { length } split /\s+/smx, $normalized];
 }
 
 sub calculate_polarity_analysis {
-    my ( $tokens, $lexicon ) = @_;
+    my ($tokens, $lexicon) = @_;
     my @found_words;
 
-    for my $word ( @{$tokens} ) {
-        if ( !exists $lexicon -> {$word} ) {
+    for my $word (@{$tokens}) {
+        if (!exists $lexicon -> {$word}) {
             next;
         }
 
-        my $emotions     = $lexicon -> {$word};
+        my $emotions = $lexicon -> {$word};
         my $positive_val = $emotions -> {positive} // 0;
         my $negative_val = $emotions -> {negative} // 0;
-        my $word_score   = $positive_val - $negative_val;
+        my $word_score = $positive_val - $negative_val;
 
-        if ( $word_score == 0 ) {
+        if ($word_score == 0) {
             next;
         }
 
         my $sentiment;
-        if ( $word_score > 0 ) {
+        if ($word_score > 0) {
             $sentiment = 'positive';
         }
-        if ( $word_score < 0 ) {
+        if ($word_score < 0) {
             $sentiment = 'negative';
         }
 
@@ -55,7 +55,7 @@ sub calculate_polarity_analysis {
         };
     }
 
-    my $total_score = sum( 0, map { $_ -> {score} } @found_words );
+    my $total_score = sum(0, map { $_ -> {score} } @found_words);
 
     return {
         score => $total_score,
@@ -64,16 +64,16 @@ sub calculate_polarity_analysis {
 }
 
 sub calculate_emotion_analysis {
-    my ( $tokens, $lexicon ) = @_;
+    my ($tokens, $lexicon) = @_;
     my @found_words;
 
-    for my $word ( @{$tokens} ) {
-        if ( !exists $lexicon -> {$word} ) {
+    for my $word (@{$tokens}) {
+        if (!exists $lexicon -> {$word}) {
             next;
         }
 
         my $word_emotions = $lexicon -> {$word};
-        if ( !%{$word_emotions} ) {
+        if (!%{$word_emotions}) {
             next;
         }
 
@@ -83,17 +83,17 @@ sub calculate_emotion_analysis {
         };
     }
 
-    return { words => \@found_words };
+    return {words => \@found_words};
 }
 
 sub calculate_sentence_analyses {
-    my ( $sentences, $lexicon ) = @_;
+    my ($sentences, $lexicon) = @_;
     my @results;
 
-    for my $sentence ( @{$sentences} ) {
+    for my $sentence (@{$sentences}) {
         my $tokens          = tokenize_text($sentence);
-        my $polarity_result = calculate_polarity_analysis( $tokens, $lexicon );
-        my $emotion_result  = calculate_emotion_analysis( $tokens, $lexicon );
+        my $polarity_result = calculate_polarity_analysis($tokens, $lexicon);
+        my $emotion_result  = calculate_emotion_analysis($tokens, $lexicon);
 
         push @results, {
             sentence       => $sentence,
