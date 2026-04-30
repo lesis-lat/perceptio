@@ -2,7 +2,7 @@ requires 'JSON::MaybeXS',       '1.004008';
 requires 'Getopt::Long',        '2.58';
 requires 'File::Slurper',       '0.014';
 requires 'List::Util', '1.70';
-requires 'Encode',              '3.21';
+requires 'Encode', '3.24';
 requires 'Const::Fast',         '0.014';
 requires 'HTTP::Tiny', '0.092';
 requires 'Lingua::Identify',    '0.56';
