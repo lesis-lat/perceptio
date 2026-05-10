@@ -11,7 +11,7 @@ on 'test' => sub {
 requires 'Test::More', '1.302219';
 requires 'Test::Exception',     '0.43';
 requires 'Test::MockObject',    '1.20200122';
-requires 'Test::MockModule', 'v0.183.0';
+requires 'Test::MockModule', 'v0.185.0';
 requires 'Readonly',            '2.05';
 requires 'Try::Tiny',           '0.32';
 
