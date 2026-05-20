@@ -4,7 +4,7 @@ requires 'File::Slurper',       '0.014';
 requires 'List::Util', '1.70';
 requires 'Encode', '3.24';
 requires 'Const::Fast',         '0.014';
-requires 'HTTP::Tiny', '0.092';
+requires 'HTTP::Tiny', '0.094';
 requires 'Lingua::Identify',    '0.56';
 
 on 'test' => sub {
