@@ -8,7 +8,7 @@ requires 'HTTP::Tiny', '0.096';
 requires 'Lingua::Identify',    '0.56';
 
 on 'test' => sub {
-requires 'Test::More', '1.302219';
+requires 'Test::More', '1.302220';
 requires 'Test::Exception',     '0.43';
 requires 'Test::MockObject',    '1.20200122';
 requires 'Test::MockModule', 'v0.185.2';
